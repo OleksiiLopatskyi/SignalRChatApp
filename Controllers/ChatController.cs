@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using SignalRChatApp.Models;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.AspNetCore.SignalR;
 
 namespace SignalRChatApp.Controllers
 {
@@ -15,9 +15,12 @@ namespace SignalRChatApp.Controllers
         private ChatContext _db;
         private static Chat _chat;
         private static User _userTo, _userFrom;
-        public ChatController(ChatContext context)
+        IHubContext<ChatHub> _hubContext;
+
+        public ChatController(ChatContext context,IHubContext<ChatHub>hub)
         {
             _db = context;
+            _hubContext = hub;
         }
         public IActionResult Index()
         {
@@ -48,20 +51,22 @@ namespace SignalRChatApp.Controllers
             _chat = Chat;
             return View(Chat);
         }
-
+        [HttpPost]
         public async Task<IActionResult> SendMessage(string message)
         {
-            Message createdMesage = new Message {
-                UserFrom = _userFrom,
-                UserTo = _userTo,
+            Message createdMessage = new Message {
+                UserFrom = _userFrom.Username,
+                UserTo = _userTo.Username,
                 Date = DateTime.Now.ToString("hh:mm"),
                 Text=message
             };
-            ViewBag.CurrentMessage = createdMesage;
+            await _hubContext.Clients.Users(new string[] { _userTo.Username, _userFrom.Username })
+                                     .SendAsync("Receive",createdMessage,_userFrom.Username,_userTo.Username);
+
             /*_chat.Messages.Add(createdMesage);
             _db.Chats.Update(_chat);
             _db.SaveChanges();*/
-            return RedirectToAction("ChatRoom");
+            return RedirectToAction("ChatRoom",new {name=createdMessage.UserTo});
         }
     }
 }

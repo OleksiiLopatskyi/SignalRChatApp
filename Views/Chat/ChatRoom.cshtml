@@ -4,8 +4,9 @@
 }
 @if (Model.UserFrom.Username == User.Identity.Name)
 {
-    <p id="UserFrom">@Model.UserFrom.Username</p>
-    <p id="UserTo">@Model.UserTo.Username</p>
+    <span id="UserFrom">@Model.UserFrom.Username</span>
+    <p></p>
+    <span id="UserTo">@Model.UserTo.Username</span>
 }
 else
 {
@@ -18,9 +19,9 @@ else
     <p>@item.Text</p>
 }
 <ul id="chatList"></ul>
+    <input id="messageText" type="text" name="message"/>message
+    <button id="sendButton" type="button" class="btn btn-outline-primary">Send</button>
 
-<input id="messageText" type="text" />message
-<button id="sendButton" type="button" class="btn btn-outline-primary">Primary</button>
 
 @section scripts{
     <script>
@@ -29,23 +30,27 @@ else
                 .withUrl("/chat")
                 .build();
 
-            hubConnection.on('Receive', function (message, user) {
-                if (@Model.UserFrom==@User.Identity.Name||@Model.UserTo.Username== user
-                    ||@Model.UserFrom.Username== user &&@Model.UserTo.Username == @User.Identity.Name) {
-                    alert(message);
+            hubConnection.on('Receive', function (message) {
+                var userTo = message.userTo;
+                var userFrom = message.userFrom;
+                var MyChatMe = $('#UserFrom').text();
+                var MyChatWith = $('#UserTo').text();
+                if (userFrom === MyChatMe || (userTo === MyChatMe && userFrom === MyChatWith)) {
+                    alert(message.text);
                 }
-            })
+
+            });
+            //не хоче перевіряти по таг хелперу
             hubConnection.start();
 
             $('#sendButton').click(function (e) {
                 e.preventDefault();
-                var message = $('#messageText').val();
+                var messageText = $('#messageText').val();
                 var user = $('#UserTo').text();
                 user = decodeURIComponent(user);
 
-               @* $.post('@Url.Action("SendMessage","Chat")', { message: messageText }, function (data) {
-                });*@
-                hubConnection.invoke('SendMessage', message, user);
+                $.post('@Url.Action("SendMessage", "Chat")', { message: messageText }, function (data) {
+                });
             });
         });
 
