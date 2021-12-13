@@ -1,0 +1,30 @@
+﻿@model SignalRChatApp.ViewModels.LoginViewModel
+@{
+    Layout = "_Layout";
+}
+<style>
+    .form-register {
+        width: 100%;
+        max-width: 330px;
+        padding: 15px;
+        margin: 0 auto;
+    }
+</style>
+<body class="text-center">
+    <form class="form-register" asp-action="Login" asp-controller="Account" method="post">
+        <img class="mb-4" src="https://getbootstrap.com/docs/4.0/assets/brand/bootstrap-solid.svg" alt="" width="72" height="72">
+        <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
+        <label asp-for="Login" class="sr-only">Username</label>
+        <input asp-for="Login" type="text" id="inputEmail" class="form-control" placeholder="Username"><br>
+        <span asp-validation-for="Login"></span>
+        <label asp-for="Password" class="sr-only">Password</label>
+        <input asp-for="Password" id="inputPassword" class="form-control" placeholder="Password"><br>
+        <span asp-validation-for="Password"></span>
+
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+        <div class="btn-link">
+            <a asp-action="Register">Register</a>
+        </div>
+
+    </form>
+</body>

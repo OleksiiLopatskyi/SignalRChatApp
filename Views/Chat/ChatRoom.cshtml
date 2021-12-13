@@ -1,0 +1,53 @@
+﻿@model Chat
+@{
+    Layout = "_Layout";
+}
+@if (Model.UserFrom.Username == User.Identity.Name)
+{
+    <p id="UserFrom">@Model.UserFrom.Username</p>
+    <p id="UserTo">@Model.UserTo.Username</p>
+}
+else
+{
+    <span id="UserFrom">@Model.UserTo.Username</span>
+    <p></p>
+    <span id="UserTo">@Model.UserFrom.Username</span>
+}
+@foreach (var item in Model.Messages)
+{
+    <p>@item.Text</p>
+}
+<ul id="chatList"></ul>
+
+<input id="messageText" type="text" />message
+<button id="sendButton" type="button" class="btn btn-outline-primary">Primary</button>
+
+@section scripts{
+    <script>
+        $(document).ready(function (e) {
+            const hubConnection = new signalR.HubConnectionBuilder()
+                .withUrl("/chat")
+                .build();
+
+            hubConnection.on('Receive', function (message, user) {
+                if (@Model.UserFrom==@User.Identity.Name||@Model.UserTo.Username== user
+                    ||@Model.UserFrom.Username== user &&@Model.UserTo.Username == @User.Identity.Name) {
+                    alert(message);
+                }
+            })
+            hubConnection.start();
+
+            $('#sendButton').click(function (e) {
+                e.preventDefault();
+                var message = $('#messageText').val();
+                var user = $('#UserTo').text();
+                user = decodeURIComponent(user);
+
+               @* $.post('@Url.Action("SendMessage","Chat")', { message: messageText }, function (data) {
+                });*@
+                hubConnection.invoke('SendMessage', message, user);
+            });
+        });
+
+    </script>
+}

@@ -1,0 +1,36 @@
+﻿@model SignalRChatApp.ViewModels.RegisterViewModel
+@{
+    Layout = "_Layout";
+}
+<style>
+    .form-register {
+        width: 100%;
+        max-width: 330px;
+        padding: 15px;
+        margin: 0 auto;
+    }
+</style>
+<body class="text-center">
+    <form class="form-register" asp-action="Register" asp-controller="Account" method="post">
+        <img class="mb-4" src="https://getbootstrap.com/docs/4.0/assets/brand/bootstrap-solid.svg" alt="" width="72" height="72">
+        <h1 class="h3 mb-3 font-weight-normal">Please registrate</h1>
+        <label asp-for="Email" class="sr-only">Email address</label>
+        <input asp-for="Email" type="email" id="inputEmail" class="form-control" placeholder="Email address"><br>
+        <span asp-validation-for="Email" class="text-danger"></span>
+        <label asp-for="Username" class="sr-only">Username</label>
+        <input asp-for="Username" id="inputEmail" class="form-control" placeholder="Username"><br>
+        <span asp-validation-for="Username" class="text-danger"></span>
+        <label asp-for="Password" class="sr-only">Password</label>
+        <input asp-for="Password" id="inputPassword" class="form-control" placeholder="Password"><br>
+        <span asp-validation-for="Password" class="text-danger"></span>
+        <label asp-for="ConfirmPassword" class="sr-only">Password</label>
+        <input asp-for="ConfirmPassword" id="inputPassword" class="form-control" placeholder="Password">
+        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+        <br>
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Register</button>
+        <div class="checkbox mb-3">
+            Already have account?<a asp-action="Login">Log in</a>
+        </div>
+
+    </form>
+</body>

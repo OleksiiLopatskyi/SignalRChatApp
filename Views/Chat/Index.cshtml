@@ -1,0 +1,7 @@
+﻿@model IEnumerable<User>
+
+@foreach (var item in Model)
+{
+    <p>@item.Username <a asp-route-name="@item.Username" asp-action="ChatRoom">Send</a></p> 
+
+}
