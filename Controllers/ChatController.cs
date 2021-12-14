@@ -52,16 +52,16 @@ namespace SignalRChatApp.Controllers
             return View(Chat);
         }
         [HttpPost]
-        public async Task<IActionResult> SendMessage(string message)
+        public async Task<IActionResult> SendMessage(string message,string name)
         {
             Message createdMessage = new Message {
-                UserFrom = _userFrom.Username,
-                UserTo = _userTo.Username,
+                UserFrom = User.Identity.Name,
+                UserTo = name,
                 Date = DateTime.Now.ToString("hh:mm"),
                 Text=message
             };
             await _hubContext.Clients.Users(new string[] { _userTo.Username, _userFrom.Username })
-                                     .SendAsync("Receive",createdMessage,_userFrom.Username,_userTo.Username);
+                                     .SendAsync("Receive",createdMessage,User.Identity.Name,_userTo.Username);
 
             /*_chat.Messages.Add(createdMesage);
             _db.Chats.Update(_chat);

@@ -30,17 +30,19 @@ else
                 .withUrl("/chat")
                 .build();
 
+            var MyChatMe = $('#UserFrom').text();
+            var MyChatWith = $('#UserTo').text();
+
             hubConnection.on('Receive', function (message) {
                 var userTo = message.userTo;
                 var userFrom = message.userFrom;
-                var MyChatMe = $('#UserFrom').text();
-                var MyChatWith = $('#UserTo').text();
+               
                 if (userFrom === MyChatMe || (userTo === MyChatMe && userFrom === MyChatWith)) {
                     alert(message.text);
                 }
 
             });
-            //не хоче перевіряти по таг хелперу
+
             hubConnection.start();
 
             $('#sendButton').click(function (e) {
@@ -49,7 +51,7 @@ else
                 var user = $('#UserTo').text();
                 user = decodeURIComponent(user);
 
-                $.post('@Url.Action("SendMessage", "Chat")', { message: messageText }, function (data) {
+                $.post('@Url.Action("SendMessage", "Chat")', { message: messageText, name: MyChatWith }, function (data) {
                 });
             });
         });
