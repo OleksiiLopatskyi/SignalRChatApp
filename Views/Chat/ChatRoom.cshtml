@@ -26,31 +26,38 @@ else
 @section scripts{
     <script>
         $(document).ready(function (e) {
+            //Connect to hub
             const hubConnection = new signalR.HubConnectionBuilder()
                 .withUrl("/chat")
                 .build();
 
+            //Get chatting users
             var MyChatMe = $('#UserFrom').text();
             var MyChatWith = $('#UserTo').text();
 
+            //Output alert if client receive a message 
             hubConnection.on('Receive', function (message) {
                 var userTo = message.userTo;
                 var userFrom = message.userFrom;
-               
+
+             //Check if two users chatting in the same chat
                 if (userFrom === MyChatMe || (userTo === MyChatMe && userFrom === MyChatWith)) {
-                    alert(message.text);
+                    var messageElement = `<li>From:${message.userFrom} "${message.text}"</li>`;
+                    $("#chatList").append(messageElement);
                 }
 
             });
 
+            //Try get connection with chat
             hubConnection.start();
 
+            //On click send_message button
             $('#sendButton').click(function (e) {
                 e.preventDefault();
                 var messageText = $('#messageText').val();
                 var user = $('#UserTo').text();
                 user = decodeURIComponent(user);
-
+                //Pass message and user we are chatting to SendMessage action within ChatController
                 $.post('@Url.Action("SendMessage", "Chat")', { message: messageText, name: MyChatWith }, function (data) {
                 });
             });
