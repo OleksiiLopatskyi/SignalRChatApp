@@ -4,8 +4,9 @@
 }
 @if (Model.UserFrom.Username == User.Identity.Name)
 {
-    <p id="UserFrom">@Model.UserFrom.Username</p>
-    <p id="UserTo">@Model.UserTo.Username</p>
+    <span id="UserFrom">@Model.UserFrom.Username</span>
+    <p></p>
+    <span id="UserTo">@Model.UserTo.Username</span>
 }
 else
 {
@@ -18,34 +19,47 @@ else
     <p>@item.Text</p>
 }
 <ul id="chatList"></ul>
+    <input id="messageText" type="text" name="message"/>message
+    <button id="sendButton" type="button" class="btn btn-outline-primary">Send</button>
 
-<input id="messageText" type="text" />message
-<button id="sendButton" type="button" class="btn btn-outline-primary">Primary</button>
 
 @section scripts{
     <script>
         $(document).ready(function (e) {
+            //Connect to hub
             const hubConnection = new signalR.HubConnectionBuilder()
                 .withUrl("/chat")
                 .build();
 
-            hubConnection.on('Receive', function (message, user) {
-                if (@Model.UserFrom==@User.Identity.Name||@Model.UserTo.Username== user
-                    ||@Model.UserFrom.Username== user &&@Model.UserTo.Username == @User.Identity.Name) {
-                    alert(message);
+            //Get chatting users
+            var MyChatMe = $('#UserFrom').text();
+            var MyChatWith = $('#UserTo').text();
+
+            //Output alert if client receive a message 
+            hubConnection.on('Receive', function (message) {
+                var userTo = message.userTo;
+                var userFrom = message.userFrom;
+
+             //Check if two users chatting in the same chat
+                if (userFrom === MyChatMe || (userTo === MyChatMe && userFrom === MyChatWith)) {
+                    var messageElement = `<li>From:${message.userFrom} "${message.text}"</li>`;
+                    $("#chatList").append(messageElement);
                 }
-            })
+
+            });
+
+            //Try get connection with chat
             hubConnection.start();
 
+            //On click send_message button
             $('#sendButton').click(function (e) {
                 e.preventDefault();
-                var message = $('#messageText').val();
+                var messageText = $('#messageText').val();
                 var user = $('#UserTo').text();
                 user = decodeURIComponent(user);
-
-               @* $.post('@Url.Action("SendMessage","Chat")', { message: messageText }, function (data) {
-                });*@
-                hubConnection.invoke('SendMessage', message, user);
+                //Pass message and user we are chatting to SendMessage action within ChatController
+                $.post('@Url.Action("SendMessage", "Chat")', { message: messageText, name: MyChatWith }, function (data) {
+                });
             });
         });
 
